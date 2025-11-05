@@ -28,6 +28,16 @@ variable "my_bastion_ip" {
   }
 }
 
+# --- [추가] Bastion 서버의 보안 그룹 조회 ---
+data "aws_security_group" "bastion_sg" {
+  filter {
+    name   = "group-name"
+    values = [var.my_bastion_sg_name]
+  }
+  
+  vpc_id = data.aws_vpc.target.id
+}
+
 # --- [추가됨] EC2 부팅 시 실행할 스크립트 정의 (DRY 원칙) ---
 locals {
   docker_install_script = <<-EOF
@@ -172,7 +182,7 @@ resource "aws_instance" "api_server_dev" {
 # RDS에 적용할 보안 그룹 (EC2 보안 그룹에서만 5432 포트 허용)
 resource "aws_security_group" "rds_sg" {
   name        = "inha-capstone-04-rds-postgres-allow-sg"
-  description = "Allow PostgreSQL from EC2 SG"
+  description = "Allow PostgreSQL from EC2 SG and Bastion SG"
   vpc_id      = data.aws_vpc.target.id
 
   ingress {
@@ -182,6 +192,14 @@ resource "aws_security_group" "rds_sg" {
     protocol        = "tcp"
     # 위에서 생성한 EC2 인스턴스(의 보안 그룹)에서만 접속 허용
     security_groups = [aws_security_group.ec2_sg.id] 
+  }
+
+  ingress {
+    description = "PostgreSQL from Bastion (for IntelliJ Tunnel)"
+    from_port   = 5432
+    to_port     = 5432
+    protocol    = "tcp"
+    security_groups = [data.aws_security_group.bastion_sg.id]
   }
 
   egress {

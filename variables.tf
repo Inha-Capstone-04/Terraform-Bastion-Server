@@ -48,3 +48,9 @@ variable "target_vpc_id" {
   type        = string
   # default 값을 설정하지 않아, secrets.tfvars에서 필수로 입력해야 함
 }
+
+variable "my_bastion_sg_name" {
+  type        = string
+  description = "IntelliJ 터널링에 사용할 Bastion 서버의 보안 그룹 이름"
+  default = "inha-capstone-04-sg-bastion-host"
+}
