@@ -22,6 +22,32 @@ variable "existing_instance_profile_name" {
   type        = string
 }
 
+variable "my_bastion_ip" {
+  type        = string
+  description = "Terraform을 실행하는 Bastion 서버의 Public IP (예: '1.2.3.4')"
+  
+  validation {
+    condition     = can(regex("^\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}$", var.my_bastion_ip))
+    error_message = "유효한 IPv4 주소 형식을 입력해야 합니다."
+  }
+}
+
+variable "dev_ec2_cidr_blocks" {
+  type        = string
+  description = "EC2 3대의 ssh 접근용 인바운드 IP 또는 CIDR (예: '0.0.0.0/0')"
+
+  validation {
+    condition     = can(cidrhost(var.dev_ec2_cidr_blocks, 0))
+    error_message = "유효한 IPv4 CIDR 형식(예: 1.2.3.4/32 또는 0.0.0.0/0)이어야 합니다."
+  }
+}
+
+variable "my_bastion_sg_name" {
+  type        = string
+  description = "Bastion 서버의 보안 그룹 이름 (데이터 소스 조회용)"
+  default     = "inha-capstone-04-sg-bastion-host"
+}
+
 # --- S3 설정 ---
 variable "s3_bucket_name_prefix" {
   description = "S3 버킷 이름 (고유해야 하므로 접두사 사용)"
@@ -33,24 +59,23 @@ variable "s3_bucket_name_prefix" {
 variable "db_username" {
   description = "RDS PostgreSQL 관리자 유저 이름"
   type        = string
-  sensitive   = true # 민감 정보로 표시
+  sensitive   = true
 }
 
 variable "db_password" {
   description = "RDS PostgreSQL 관리자 비밀번호"
   type        = string
-  sensitive   = true # 민감 정보로 표시
+  sensitive   = true
+}
+
+variable "allowed_rds_cidr_blocks" {
+  type        = list(string)
+  description = "RDS에 접속을 허용할 CIDR 블록 리스트"
+  default     = ["0.0.0.0/0"]
 }
 
 # --- VPC 설정 ---
 variable "target_vpc_id" {
   description = "배포를 진행할 대상 VPC의 ID"
   type        = string
-  # default 값을 설정하지 않아, secrets.tfvars에서 필수로 입력해야 함
-}
-
-variable "my_bastion_sg_name" {
-  type        = string
-  description = "IntelliJ 터널링에 사용할 Bastion 서버의 보안 그룹 이름"
-  default = "inha-capstone-04-sg-bastion-host"
 }
