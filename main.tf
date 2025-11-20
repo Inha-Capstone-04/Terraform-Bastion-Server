@@ -52,6 +52,25 @@ locals {
     dnf install -y amazon-ssm-agent
     systemctl enable amazon-ssm-agent
     systemctl start amazon-ssm-agent
+
+    # 4. Redis Container 실행 및 Named Volume 설정 (로컬 환경 호환성 확보)
+    
+    # 4-1. Named Volume 생성: 호스트 경로와 관계없이 Docker가 관리하는 Volume 생성
+    docker volume create embersentinel_redis_data
+    
+    # Redis 컨테이너 실행: 
+    # -d: 데몬 모드
+    # --name: 컨테이너 이름 지정 (API 서버에서 'redis' 이름으로 접근)
+    # -p 6379:6379: 포트 포워딩 (localhost:6379로 접근 가능)
+    # -v: 호스트 디렉토리를 컨테이너 /data에 매핑 (데이터 지속성 확보)
+    # redis-server --appendonly yes: AOF (Append Only File)로 데이터 지속성 설정
+    docker run -d \
+      --name embersentinel-redis \
+      -p 6379:6379 \
+      -v embersentinel_redis_data:/data \
+      --restart always \
+      redis:7.0-alpine \
+      redis-server --appendonly yes
     
     # 참고: 'usermod' 변경 사항은 새 로그인 세션부터 적용됩니다.
   EOF
@@ -142,6 +161,7 @@ resource "aws_instance" "api_server" {
   tags = {
     Name = "inha-capstone-04-api-server"
     Env  = "prod"
+    username = "inha-capstone-04"
   }
 }
 
@@ -160,6 +180,7 @@ resource "aws_instance" "livekit_server" {
 
   tags = {
     Name = "inha-capstone-04-livekit-server"
+    username = "inha-capstone-04"
   }
 }
 
@@ -179,6 +200,7 @@ resource "aws_instance" "api_server_dev" {
   tags = {
     Name = "inha-capstone-04-api-server-dev"
     Env  = "dev"
+    username = "inha-capstone-04"
   }
 }
 
