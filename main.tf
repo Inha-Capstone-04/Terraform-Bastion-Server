@@ -53,19 +53,17 @@ locals {
     systemctl enable amazon-ssm-agent
     systemctl start amazon-ssm-agent
 
-    # 4. Redis Container 실행 및 Named Volume 설정 (로컬 환경 호환성 확보)
+    # 3. Docker 사용자 정의 네트워크 생성
+    # 이미 존재하면 에러가 날 수 있으므로 || true로 무시하거나 검사
+    docker network create ember-network || true
     
-    # 4-1. Named Volume 생성: 호스트 경로와 관계없이 Docker가 관리하는 Volume 생성
+    # 4. Redis Volume 생성
     docker volume create embersentinel_redis_data
     
-    # Redis 컨테이너 실행: 
-    # -d: 데몬 모드
-    # --name: 컨테이너 이름 지정 (API 서버에서 'redis' 이름으로 접근)
-    # -p 6379:6379: 포트 포워딩 (localhost:6379로 접근 가능)
-    # -v: 호스트 디렉토리를 컨테이너 /data에 매핑 (데이터 지속성 확보)
-    # redis-server --appendonly yes: AOF (Append Only File)로 데이터 지속성 설정
+    # 5. Redis 컨테이너 실행
     docker run -d \
       --name embersentinel-redis \
+      --network ember-network \
       -p 6379:6379 \
       -v embersentinel_redis_data:/data \
       --restart always \
