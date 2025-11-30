@@ -79,3 +79,17 @@ variable "target_vpc_id" {
   description = "배포를 진행할 대상 VPC의 ID"
   type        = string
 }
+
+# LiveKit API Key
+variable "livekit_api_key" {
+  type        = string
+  description = "LiveKit Server API Key"
+  sensitive   = true
+}
+
+# LiveKit API Secret
+variable "livekit_api_secret" {
+  type        = string
+  description = "LiveKit Server API Secret"
+  sensitive   = true
+}

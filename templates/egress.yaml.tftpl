@@ -1,0 +1,25 @@
+api_key: ${api_key}
+api_secret: ${api_secret}
+ws_url: ws://localhost:7880
+insecure: true
+
+redis:
+  address: localhost:6379
+  username: ""
+  password: ""
+
+# [핵심] IAM Role 사용 시 key/secret을 비워두면 자동으로 인스턴스 권한을 사용합니다.
+s3:
+  access_key: "" 
+  secret: ""
+  region: ${aws_region}
+  bucket: ${s3_bucket_name}
+
+logging:
+  level: info
+
+cpu_cost:
+  room_composite_cpu_cost: 1.0    # 기본 3~4 대신 1.0
+  web_cpu_cost: 1.0
+  track_composite_cpu_cost: 0.5
+  track_cpu_cost: 0.5

@@ -1,0 +1,37 @@
+version: '3.8'
+
+services:
+  livekit:
+    image: livekit/livekit-server:latest
+    command: --config /etc/livekit.yaml
+    restart: always
+    network_mode: host
+    volumes:
+      - ./livekit.yaml:/etc/livekit.yaml:ro,z
+    depends_on:
+      - redis
+
+  redis:
+    image: redis:7.0-alpine
+    command: redis-server --bind 0.0.0.0 --port 6379
+    restart: always
+    network_mode: host
+
+  # Egress 서비스
+  egress:
+    image: livekit/egress:latest
+    environment:
+      - EGRESS_CONFIG_FILE=/etc/egress.yaml
+      - EGRESS_MIN_CPU=1
+      - EGRESS_CPU_LIMIT=1
+    restart: always
+    network_mode: host
+    # 중요: 비디오 인코딩을 위한 시스템 권한 필요
+    shm_size: 2gb
+    cap_add:
+      - SYS_ADMIN
+    volumes:
+      - /home/ec2-user/livekit/egress.yaml:/etc/egress.yaml
+    depends_on:
+      - redis
+      - livekit
