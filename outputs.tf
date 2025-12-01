@@ -1,8 +1,3 @@
-output "api_server_public_ip" {
-  description = "API Server (Prod)의 Public IP 주소"
-  value       = aws_instance.api_server.public_ip
-}
-
 output "livekit_server_public_ip" {
   description = "LiveKit Server의 Public IP 주소"
   value       = aws_instance.livekit_server.public_ip

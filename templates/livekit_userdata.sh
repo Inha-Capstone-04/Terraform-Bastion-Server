@@ -16,8 +16,8 @@ mkdir -p /home/ec2-user/livekit
 cd /home/ec2-user/livekit
 
 # Docker 컨테이너 내부의 non-root 유저(egress)가 쓸 수 있도록 777 권한 부여
-mkdir -p /home/ec2-user/livekit/tmp
-chmod -R 777 /home/ec2-user/livekit/tmp
+mkdir -p /home/ec2-user/livekit/recordings
+chmod -R 777 /home/ec2-user/livekit/recordings
 
 # 3. 설정 파일 생성 (Terraform에서 주입된 내용)
 cat <<EOF > livekit.yaml

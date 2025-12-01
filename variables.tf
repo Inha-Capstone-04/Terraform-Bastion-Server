@@ -6,10 +6,16 @@ variable "aws_region" {
 }
 
 # --- EC2 설정 ---
-variable "instance_type" {
+variable "instance_type_t3_medium" {
   description = "EC2 인스턴스 타입"
   type        = string
   default     = "t3.medium"
+}
+
+variable "instance_type_m5_xlarge" {
+  description = "EC2 인스턴스 타입"
+  type        = string
+  default     = "m5.xlarge"
 }
 
 variable "ec2_key_pair_name" {

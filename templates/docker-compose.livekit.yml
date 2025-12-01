@@ -22,8 +22,6 @@ services:
     image: livekit/egress:latest
     environment:
       - EGRESS_CONFIG_FILE=/etc/egress.yaml
-      - EGRESS_MIN_CPU=1
-      - EGRESS_CPU_LIMIT=1
     restart: always
     network_mode: host
     # 중요: 비디오 인코딩을 위한 시스템 권한 필요
@@ -32,6 +30,7 @@ services:
       - SYS_ADMIN
     volumes:
       - /home/ec2-user/livekit/egress.yaml:/etc/egress.yaml
+      - /home/ec2-user/livekit/recordings:/recordings
     depends_on:
       - redis
       - livekit

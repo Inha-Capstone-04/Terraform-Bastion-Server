@@ -180,30 +180,10 @@ resource "aws_security_group" "livekit_sg" {
 
 # --- 3. EC2 인스턴스 ---
 
-# 3.1 API 서버 (Prod) - Redis 실행 스크립트 적용
-resource "aws_instance" "api_server" {
-  ami           = data.aws_ssm_parameter.al2023_ami.value
-  instance_type = var.instance_type
-  subnet_id     = data.aws_subnets.target.ids[0]
-  
-  vpc_security_group_ids = [aws_security_group.ec2_sg.id]
-  key_name               = var.ec2_key_pair_name
-  iam_instance_profile   = data.aws_iam_instance_profile.existing_profile.name
-
-  # [API 서버용 스크립트]
-  user_data = local.api_server_userdata
-
-  tags = {
-    Name     = "inha-capstone-04-api-server"
-    Env      = "prod"
-    username = "inha-capstone-04"
-  }
-}
-
 # 3.2 LiveKit 서버 - LiveKit 실행 스크립트 적용
 resource "aws_instance" "livekit_server" {
   ami           = data.aws_ssm_parameter.al2023_ami.value
-  instance_type = var.instance_type
+  instance_type = var.instance_type_m5_xlarge
   subnet_id     = data.aws_subnets.target.ids[1]
 
   # [LiveKit 전용 보안 그룹]
@@ -224,7 +204,7 @@ resource "aws_instance" "livekit_server" {
 # 3.3 API 서버 (Dev) - Redis 실행 스크립트 적용
 resource "aws_instance" "api_server_dev" {
   ami           = data.aws_ssm_parameter.al2023_ami.value
-  instance_type = var.instance_type
+  instance_type = var.instance_type_t3_medium
   subnet_id     = data.aws_subnets.target.ids[0]
   
   vpc_security_group_ids = [aws_security_group.ec2_sg.id]
